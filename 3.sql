@@ -27,7 +27,7 @@ CREATE TYPE ERank AS ENUM ('NEWBIE',
 
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users(
-    cf_handle varchar(20) UNIQUE CHECK (cf_handle ~ '^[a-zA-Z0-9_]$' and char_length(cf_handle) > 3),
+    cf_handle varchar(20) UNIQUE CHECK (cf_handle ~ '^[a-zA-Z0-9_]+$' and char_length(cf_handle) > 3),
     group_id integer REFERENCES groups(group_id)  ON DELETE CASCADE,
     rank ERank default 'NEWBIE' NOT NULL,
     firstname varchar(20),
