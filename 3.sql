@@ -7,7 +7,7 @@ SET SEARCH_PATH = cf_monitor_db;
 -- Создание таблиц
 DROP TABLE IF EXISTS groups CASCADE;
 CREATE TABLE groups (
-    group_id serial NOT NULL,
+    group_id serial,
     group_name text CHECK (group_name != ''),
     PRIMARY KEY (group_id)
 );
@@ -27,7 +27,7 @@ CREATE TYPE ERank AS ENUM ('NEWBIE',
 
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users(
-    cf_handle varchar(20) UNIQUE CHECK (cf_handle ~ '^[a-zA-Z0-9_]+$' and char_length(cf_handle) > 3),
+    cf_handle varchar(20) CHECK (cf_handle ~ '^[a-zA-Z0-9_]+$' and char_length(cf_handle) > 3),
     group_id integer REFERENCES groups(group_id)  ON DELETE CASCADE,
     rank ERank default 'NEWBIE' NOT NULL,
     firstname varchar(20),
@@ -38,7 +38,7 @@ CREATE TABLE users(
 
 DROP TABLE IF EXISTS problems CASCADE;
 CREATE TABLE problems(
-    problem_id text UNIQUE NOT NULL CHECK (problem_id ~ '[0-9]+[A-Z]'),
+    problem_id text CHECK (problem_id ~ '[0-9]+[A-Z]'),
     title text NOT NULL,
     rating integer,
     PRIMARY KEY (problem_id)
@@ -52,7 +52,7 @@ CREATE TYPE EVerdict AS ENUM ('OK',
 
 DROP TABLE IF EXISTS submissions CASCADE;
 CREATE TABLE submissions(
-    cf_id integer NOT NULL UNIQUE,
+    cf_id integer,
     cf_handle varchar(20) REFERENCES users(cf_handle)  ON DELETE CASCADE,
     problem_id text REFERENCES problems(problem_id)  ON DELETE CASCADE,
     verdict EVERDICT NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE submissions(
 
 DROP TABLE IF EXISTS curators CASCADE;
 CREATE TABLE curators(
-    login text UNIQUE NOT NULL CHECK(char_length(login) > 3),
+    login text CHECK(char_length(login) > 3),
     cf_handle varchar(20) REFERENCES users(cf_handle) ON DELETE CASCADE,
     password text NOT NULL CHECK(char_length(password) > 7),
     PRIMARY KEY (login)
@@ -80,7 +80,7 @@ CREATE TABLE curators_in_groups(
 
 DROP TABLE IF EXISTS problemsets CASCADE;
 CREATE TABLE problemsets(
-    problemset_id serial NOT NULL,
+    problemset_id serial,
     curator_login text REFERENCES curators(login) ON DELETE SET NULL,
     title text NOT NULL CHECK (title != ''),
     PRIMARY KEY (problemset_id)
@@ -100,7 +100,7 @@ CREATE TABLE problems_in_problemsets(
     problem_id text REFERENCES problems(problem_id)  ON DELETE CASCADE,
     problemset_id integer REFERENCES problemsets(problemset_id)  ON DELETE CASCADE,
     priority integer NOT NULL CHECK (priority > 0),
-    valid_from_dttm date NOT NULL,
+    valid_from_dttm date,
     valid_to_dttm date NOT NULL CHECK (valid_to_dttm > valid_from_dttm),
     PRIMARY KEY (problem_id, problemset_id, valid_from_dttm)
 );
